@@ -405,83 +405,12 @@ I want to spin up the vector store with metadata‑aware similarity search so I 
 
 ---
 
-## Epic 6: Pre-Aggregation, Caching & Drill-Down
+## Epic 6: Verified Prompts 
 
-### Story 6.1 – Precompute Rolling Metrics
-
-**As a** performance engineer
-
-**I want to** compute and cache common aggregates (QoQ change, YoY % delta, moving averages) for each Section node
-
-**so that** frequent queries hit precomputed data, reducing LLM calls.
-
-**Test Cases:**
-
-1. **Accuracy**
-    - QoQ change = `(current − prior) / prior` matches the JSON table values.
-2. **Cache TTL**
-    - Cached aggregates expire after 24 hours, forcing a refresh on new data.
-3. **Cache hit**
-    - A second request for the same metric within TTL returns from cache, not raw docs.
-
-### Story 6.2 – Interactive Drill-Down
-
-**As an** end user
-
-**I want to** request deeper detail on any summarized batch (e.g. “Show me BMO Q2 raw table”)
-
-**so that** I can verify specifics.
-
-**Test Cases:**
-
-1. **Direct retrieval**
-    - Given a batch ID, the system returns the raw JSON table for that quarter without re-summarizing.
-2. **Authorization check**
-    - If a user lacks permission for BMO data, the drill-down request is rejected with “403 Forbidden.”
-3. **Latency**
-    - Drill-down responses return within 500 ms under normal load.
-
----
-
-## Epic 7: End-to-End Integration & Monitoring
-
-### Story 7.1 – Full Query Pipeline Test
-
-**As a** QA engineer
-
-**I want to** simulate end-to-end queries (semantic + temporal + map/reduce) in a staging environment
-
-**so that** I can validate correctness and performance.
-
-**Test Cases:**
-
-1. **Correctness**
-    - A query “RWA trend for BMO Q1 2023–Q1 2024” returns the same numbers as a manual CSV extraction.
-2. **Performance**
-    - The full pipeline completes in under 5 seconds for a 12-quarter span across 3 banks.
-3. **Error handling**
-    - If any component fails (vector store, graph DB, LLM), the system returns a graceful error message.
-
-### Story 7.2 – Monitoring & Alerting
-
-**As a** SRE
-
-**I want to** instrument each component (vector store, graph DB, orchestration service) with health checks and SLIs
-
-**so that** I get alerted on failures or performance degradations.
-
-**Test Cases:**
-
-1. **Health endpoints**
-    - Each service exposes a `/healthz` returning 200 when healthy.
-2. **SLI thresholds**
-    - LLM 95th-percentile latency <2 s; vector store error rate <1%.
-3. **Alert triggers**
-    - Simulate an LLM timeout and verify an alert is fired in PagerDuty.
-
----
-
-You can now **pick any one story**, implement it in isolation, write the code/tests, and then circle back here to move on to the next. Each story’s test cases define clear acceptance criteria so you can build and verify modules end-to-end.
+### Story 6.1 – if three users did thumbs up, update the prompt and answer as verified, if three users did thumbs down save as incorrect asnwer  
+### Story 6.2 - Use verification tag for new user queries for improving answer accuracy: 
+Step 1 Fetch from verified results: Use RAG to fetch results from verified prompts before inference if verified answer exsist.  
+Step 2: use the verification resulst in answer to provide confidence to user. 
 
 -----
 
